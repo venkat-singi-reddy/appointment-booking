@@ -124,9 +124,12 @@ git push heroku main
 
 **Note:** Heroku auto-detects the Java buildpack by finding `pom.xml` at the repository root. The build process will:
 - Install Node.js and npm using frontend-maven-plugin
-- Build the React frontend (`npm install` && `npm run build`)
+- Build the React frontend (`npm ci` && `npm run build`)
+- Clean up `frontend/node_modules` and Node artifacts to reduce slug size
 - Build the Spring Boot backend
 - Package everything into a single JAR file
+
+The `.slugignore` file excludes source files and dependencies from the final Heroku slug, keeping it lightweight.
 
 ### Environment Variables on Heroku
 
