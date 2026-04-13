@@ -1,4 +1,5 @@
 # Maven
+target/
 backend/target/
 backend/.mvn/
 !backend/.mvn/wrapper/maven-wrapper.jar
