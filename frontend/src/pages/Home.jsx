@@ -70,7 +70,10 @@ function Home() {
 
   useEffect(() => {
     doctorAPI.getAvailable()
-      .then(res => setFeaturedDoctors(res.data.slice(0, 3)))
+      .then(res => {
+        const data = Array.isArray(res.data) ? res.data : [];
+        setFeaturedDoctors(data.slice(0, 3));
+      })
       .catch(() => setFeaturedDoctors([]))
       .finally(() => setLoading(false));
   }, []);
