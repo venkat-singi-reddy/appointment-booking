@@ -26,7 +26,7 @@ function MyAppointments() {
 
     try {
       const res = await appointmentAPI.getByPatientEmail(email.trim());
-      setAppointments(res.data);
+      setAppointments(Array.isArray(res.data) ? res.data : []);
       setSearchEmail(email.trim());
       setSearched(true);
     } catch (err) {

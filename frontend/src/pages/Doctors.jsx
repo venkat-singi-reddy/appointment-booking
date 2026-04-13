@@ -19,8 +19,9 @@ function Doctors() {
   useEffect(() => {
     doctorAPI.getAll()
       .then(res => {
-        setDoctors(res.data);
-        setFiltered(res.data);
+        const data = Array.isArray(res.data) ? res.data : [];
+        setDoctors(data);
+        setFiltered(data);
       })
       .catch(() => setError('Failed to load doctors. Please try again.'))
       .finally(() => setLoading(false));
