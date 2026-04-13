@@ -40,4 +40,24 @@ export const appointmentAPI = {
     api.put(`/appointments/${id}/status`, null, { params: { status } }),
 };
 
+// Global response error interceptor – logs every API error to the console
+api.interceptors.response.use(
+  response => response,
+  error => {
+    if (error.response) {
+      // Server responded with a non-2xx status
+      const { status, data, config } = error.response;
+      const message = data?.message || data?.error || data || error.message;
+      console.error(`[API Error] ${status} ${config?.method?.toUpperCase()} ${config?.url} –`, message);
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error('[API Error] No response received –', error.message, error.request);
+    } else {
+      // Something went wrong setting up the request
+      console.error('[API Error] Request setup failed –', error.message);
+    }
+    return Promise.reject(error);
+  }
+);
+
 export default api;
