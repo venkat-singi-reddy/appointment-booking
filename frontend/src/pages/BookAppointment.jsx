@@ -46,7 +46,7 @@ function BookAppointment() {
 
   useEffect(() => {
     doctorAPI.getAvailable()
-      .then(res => setDoctors(res.data))
+      .then(res => setDoctors(Array.isArray(res.data) ? res.data : []))
       .catch(() => setError('Failed to load doctors'));
   }, []);
 
