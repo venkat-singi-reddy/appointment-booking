@@ -4,8 +4,6 @@ frontend/src
 frontend/public
 frontend/.vite
 frontend/vite.config.js
-frontend/package.json
-frontend/package-lock.json
 
 # Maven build artifacts
 target/node
