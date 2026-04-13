@@ -98,6 +98,11 @@ Runs at http://localhost:3000 (proxied to port 8080).
 
 ## Heroku Deployment
 
+This project uses a monorepo structure with both backend and frontend. The root `pom.xml` handles building both:
+1. The backend Java/Spring Boot application (from `backend/` directory)
+2. The frontend React application (from `frontend/` directory) using frontend-maven-plugin
+3. The frontend build is copied to `target/classes/static/` to be served by Spring Boot
+
 ### Setup Secrets in GitHub
 
 Navigate to **Settings → Secrets → Actions** and add:
@@ -116,6 +121,15 @@ heroku addons:create heroku-postgresql:essential-0
 heroku config:set SPRING_PROFILES_ACTIVE=prod
 git push heroku main
 ```
+
+**Note:** Heroku auto-detects the Java buildpack by finding `pom.xml` at the repository root. The build process will:
+- Install Node.js and npm using frontend-maven-plugin
+- Build the React frontend (`npm ci` && `npm run build`)
+- Clean up `frontend/node_modules` and Node artifacts to reduce slug size
+- Build the Spring Boot backend
+- Package everything into a single JAR file
+
+The `.slugignore` file excludes source files and dependencies from the final Heroku slug, keeping it lightweight.
 
 ### Environment Variables on Heroku
 

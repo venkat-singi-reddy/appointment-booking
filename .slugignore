@@ -1,0 +1,22 @@
+# Frontend source files and dependencies (not needed at runtime)
+frontend/node_modules
+frontend/src
+frontend/public
+frontend/.vite
+frontend/vite.config.js
+
+# Maven build artifacts
+target/node
+target/node_modules
+
+# Backend source files (not needed at runtime)
+backend/src
+
+# Git files
+.git
+.gitignore
+.github
+
+# Documentation
+README.md
+LICENSE
