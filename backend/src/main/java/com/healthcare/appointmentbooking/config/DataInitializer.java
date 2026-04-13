@@ -1,13 +1,21 @@
 package com.healthcare.appointmentbooking.config;
 
+import com.healthcare.appointmentbooking.model.Appointment;
+import com.healthcare.appointmentbooking.model.Appointment.AppointmentStatus;
 import com.healthcare.appointmentbooking.model.Doctor;
+import com.healthcare.appointmentbooking.model.Patient;
+import com.healthcare.appointmentbooking.model.Patient.Gender;
+import com.healthcare.appointmentbooking.repository.AppointmentRepository;
 import com.healthcare.appointmentbooking.repository.DoctorRepository;
+import com.healthcare.appointmentbooking.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Configuration
@@ -15,11 +23,14 @@ import java.util.List;
 public class DataInitializer {
 
     private final DoctorRepository doctorRepository;
+    private final PatientRepository patientRepository;
+    private final AppointmentRepository appointmentRepository;
 
     @Bean
     @Profile("!test")
     public CommandLineRunner initData() {
         return args -> {
+            // ── Doctors ────────────────────────────────────────────────────────────
             if (doctorRepository.count() == 0) {
                 List<Doctor> doctors = List.of(
                     Doctor.builder()
@@ -66,6 +77,116 @@ public class DataInitializer {
                         .available(true).build()
                 );
                 doctorRepository.saveAll(doctors);
+            }
+
+            // ── Patients ───────────────────────────────────────────────────────────
+            if (patientRepository.count() == 0) {
+                List<Patient> patients = List.of(
+                    Patient.builder()
+                        .firstName("Jennifer").lastName("Adams")
+                        .email("jennifer.adams@example.com").phone("+1-555-1001")
+                        .dateOfBirth(LocalDate.of(1985, 3, 22))
+                        .gender(Gender.FEMALE)
+                        .address("123 Maple St, Springfield, IL 62701").build(),
+                    Patient.builder()
+                        .firstName("Marcus").lastName("Rodriguez")
+                        .email("marcus.rodriguez@example.com").phone("+1-555-1002")
+                        .dateOfBirth(LocalDate.of(1990, 7, 15))
+                        .gender(Gender.MALE)
+                        .address("456 Oak Ave, Chicago, IL 60601").build(),
+                    Patient.builder()
+                        .firstName("Sophie").lastName("Chen")
+                        .email("sophie.chen@example.com").phone("+1-555-1003")
+                        .dateOfBirth(LocalDate.of(1978, 11, 5))
+                        .gender(Gender.FEMALE)
+                        .address("789 Pine Rd, Evanston, IL 60201").build(),
+                    Patient.builder()
+                        .firstName("David").lastName("Kim")
+                        .email("david.kim@example.com").phone("+1-555-1004")
+                        .dateOfBirth(LocalDate.of(1995, 1, 30))
+                        .gender(Gender.MALE)
+                        .address("321 Elm St, Naperville, IL 60540").build(),
+                    Patient.builder()
+                        .firstName("Olivia").lastName("Martinez")
+                        .email("olivia.martinez@example.com").phone("+1-555-1005")
+                        .dateOfBirth(LocalDate.of(2000, 6, 18))
+                        .gender(Gender.FEMALE)
+                        .address("654 Cedar Blvd, Aurora, IL 60505").build()
+                );
+                patientRepository.saveAll(patients);
+            }
+
+            // ── Appointments ───────────────────────────────────────────────────────
+            if (appointmentRepository.count() == 0) {
+                List<Doctor> allDoctors = doctorRepository.findAll();
+                List<Patient> allPatients = patientRepository.findAll();
+
+                Doctor cardio   = allDoctors.get(0); // Sarah Johnson – Cardiology
+                Doctor neuro    = allDoctors.get(1); // Michael Chen – Neurology
+                Doctor peds     = allDoctors.get(2); // Emily Rodriguez – Pediatrics
+                Doctor ortho    = allDoctors.get(3); // James Patel – Orthopedics
+                Doctor derm     = allDoctors.get(4); // Lisa Thompson – Dermatology
+                Doctor general  = allDoctors.get(5); // Robert Williams – General Medicine
+
+                Patient jennifer = allPatients.get(0);
+                Patient marcus   = allPatients.get(1);
+                Patient sophie   = allPatients.get(2);
+                Patient david    = allPatients.get(3);
+                Patient olivia   = allPatients.get(4);
+
+                LocalDate today    = LocalDate.now();
+                LocalDate tomorrow = today.plusDays(1);
+                LocalDate nextWeek = today.plusDays(7);
+                LocalDate past     = today.minusDays(10);
+
+                List<Appointment> appointments = List.of(
+                    // Confirmed upcoming appointments
+                    Appointment.builder()
+                        .doctor(cardio).patient(jennifer)
+                        .appointmentDate(tomorrow).appointmentTime(LocalTime.of(9, 0))
+                        .status(AppointmentStatus.CONFIRMED).appointmentType("CONSULTATION")
+                        .symptoms("Chest pain and shortness of breath").build(),
+                    Appointment.builder()
+                        .doctor(neuro).patient(marcus)
+                        .appointmentDate(tomorrow).appointmentTime(LocalTime.of(10, 30))
+                        .status(AppointmentStatus.CONFIRMED).appointmentType("FOLLOW_UP")
+                        .symptoms("Recurring headaches and dizziness").build(),
+                    Appointment.builder()
+                        .doctor(peds).patient(olivia)
+                        .appointmentDate(nextWeek).appointmentTime(LocalTime.of(11, 0))
+                        .status(AppointmentStatus.PENDING).appointmentType("GENERAL")
+                        .symptoms("Annual wellness checkup").build(),
+                    Appointment.builder()
+                        .doctor(ortho).patient(david)
+                        .appointmentDate(nextWeek).appointmentTime(LocalTime.of(14, 0))
+                        .status(AppointmentStatus.PENDING).appointmentType("CONSULTATION")
+                        .symptoms("Knee pain after sports injury").build(),
+                    Appointment.builder()
+                        .doctor(derm).patient(sophie)
+                        .appointmentDate(nextWeek).appointmentTime(LocalTime.of(15, 30))
+                        .status(AppointmentStatus.CONFIRMED).appointmentType("GENERAL")
+                        .symptoms("Skin rash and itching").build(),
+                    // Completed past appointments
+                    Appointment.builder()
+                        .doctor(general).patient(jennifer)
+                        .appointmentDate(past).appointmentTime(LocalTime.of(9, 0))
+                        .status(AppointmentStatus.COMPLETED).appointmentType("GENERAL")
+                        .symptoms("Annual physical exam")
+                        .notes("Patient is in good health. Follow-up in 12 months.").build(),
+                    Appointment.builder()
+                        .doctor(cardio).patient(marcus)
+                        .appointmentDate(past).appointmentTime(LocalTime.of(11, 0))
+                        .status(AppointmentStatus.COMPLETED).appointmentType("FOLLOW_UP")
+                        .symptoms("Post-cardiac evaluation")
+                        .notes("ECG normal. Continue current medication.").build(),
+                    // Cancelled appointment
+                    Appointment.builder()
+                        .doctor(neuro).patient(sophie)
+                        .appointmentDate(past.plusDays(3)).appointmentTime(LocalTime.of(13, 0))
+                        .status(AppointmentStatus.CANCELLED).appointmentType("CONSULTATION")
+                        .symptoms("Memory issues").build()
+                );
+                appointmentRepository.saveAll(appointments);
             }
         };
     }
